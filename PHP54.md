@@ -7,7 +7,6 @@
 
 # PHP 5.4 + FPM avec Devilbox (Docker) + httpd:2.4
 
-
 > **Pourquoi monter le code dans les deux conteneurs ?**  
 > Apache doit **servir les fichiers statiques** (CSS/JS/images), et PHP‑FPM doit **lire les scripts**. On garde **les mêmes chemins internes** `/var/www/...` dans **les deux** conteneurs pour que `ProxyPassMatch` fonctionne sans surprises.
 
@@ -19,16 +18,12 @@
 
 Un `httpd.conf` minimaliste, qui **charge les modules nécessaires** (proxy, proxy_fcgi, rewrite…) et inclut tes vhosts :
 
-> Remarques utiles :
-> - On **garde tes `ServerName`** (`legacy54`, `projet154`, `projet254`).
-> - Ton `/etc/hosts` est déjà OK :
-    >   ```
->   127.0.0.1 legacy54
->   127.0.0.1 projet154
->   127.0.0.1 projet254
->   ```
-
-
+`/etc/hosts`
+```
+127.0.0.1 legacy54
+127.0.0.1 projet154
+127.0.0.1 projet254
+```
 ---
 
 ## 4) Démarrage & tests
