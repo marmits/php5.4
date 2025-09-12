@@ -12,6 +12,15 @@
 
 ---
 
+## 1) Remarques préalables
+- Le container php 5.4 est basé sur debian 8 (jessie).
+- Le container apache est basé sur debian 13 (jessie).
+
+
+## 2) Environnement
+> Surcharger .env avec fichier `.env.local` (non versionné) 
+
+
 ## 3) Config Apache
 
 ### `apache/httpd.conf`
@@ -34,13 +43,14 @@ Un `httpd.conf` minimaliste, qui **charge les modules nécessaires** (proxy, pro
 
 2) **Lance les conteneurs** :
    ```bash
-   docker compose up -d
+   ./start.sh
    ```
+   
 
-3) **Vérifie les logs** :
+3) **Vérifie les logs (à voir)** :
    ```bash
-   docker compose logs -f apache
-   docker compose logs -f php54-fpm
+   docker logs -f fpm-php54-php
+   docker logs -f fpm-php54-apache
    ```
 
 4) **Teste depuis l’hôte** :
