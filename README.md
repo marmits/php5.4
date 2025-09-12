@@ -1,4 +1,4 @@
-> 🔐 Rappel : PHP 5.4 est en fin de vie depuis 2015 — utilisez‑le uniquement en **conteneur isolé**, derrière un reverse proxy, et non exposé directement à Internet.
+> 🔐 Rappel : PHP5.4 est en fin de vie depuis 2015 — utilisez‑le uniquement en **conteneur isolé**, derrière un reverse proxy, et non exposé directement à Internet.
 
 ---
 
