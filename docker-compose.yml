@@ -1,0 +1,21 @@
+services:
+  php54-fpm:
+    image: devilbox/php-fpm:5.4-prod
+    # ou : build: .  si vous utilisez le Dockerfile ci-dessus
+    ports:
+      - "127.0.0.1:9004:9000"      # FPM accessible en local via 127.0.0.1:9004
+    environment:
+      TIMEZONE: "Europe/Paris"     # cf. variables supportées par l'image
+      NEW_UID: "1000"              # aligne l'UID conteneur sur votre user host
+      NEW_GID: "1000"
+      # Active explicitement quelques extensions souvent requises par du legacy
+      # (disponibles via l'image Devilbox) :
+      ENABLE_MODULES: "mysql,mysqli,pdo_mysql,mcrypt,gd,intl,soap,zip"
+      # Vous pouvez désactiver des modules si besoin :
+      # DISABLE_MODULES: "xdebug"
+    volumes:
+      - ./app:/var/www/default/htdocs:rw
+      - /home/debian/devweb/php5/projet1:/var/www/projet1
+      - /home/debian/devweb/php5/projet2:/var/www/projet2
+      - ./php-custom.d:/etc/php-custom.d:ro
+    restart: unless-stopped
