@@ -1,21 +1,47 @@
 services:
   php54-fpm:
-    image: devilbox/php-fpm:5.4-prod
-    # ou : build: .  si vous utilisez le Dockerfile ci-dessus
-    ports:
-      - "127.0.0.1:9004:9000"      # FPM accessible en local via 127.0.0.1:9004
+    container_name: ${FPM_CONTAINER_NAME:-fpm-php54-php}
+    image: ${PHP_IMAGE:-devilbox/php-fpm}:${PHP_TAG:-5.4-prod}
     environment:
-      TIMEZONE: "Europe/Paris"     # cf. variables supportées par l'image
-      NEW_UID: "1000"              # aligne l'UID conteneur sur votre user host
-      NEW_GID: "1000"
-      # Active explicitement quelques extensions souvent requises par du legacy
-      # (disponibles via l'image Devilbox) :
-      ENABLE_MODULES: "mysql,mysqli,pdo_mysql,mcrypt,gd,intl,soap,zip"
-      # Vous pouvez désactiver des modules si besoin :
-      # DISABLE_MODULES: "xdebug"
+      TIMEZONE: ${TIMEZONE:-Europe/Paris}
+      NEW_UID: ${NEW_UID:-1000}
+      NEW_GID: ${NEW_GID:-1000}
+      ENABLE_MODULES: ${ENABLE_MODULES:-mysql,mysqli,pdo_mysql,mcrypt,gd,intl,soap,zip}
+
+      # Exemple SQL
+      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-privmar}
+      DB_USER: ${DB_USER:-root}
+      DB_PASS: ${DB_PASS:-ton_mot_de_passe}
+
+      # DISABLE_MODULES: xdebug
     volumes:
-      - ./app:/var/www/default/htdocs:rw
-      - /home/debian/devweb/php5/projet1:/var/www/projet1
-      - /home/debian/devweb/php5/projet2:/var/www/projet2
+      - ${APP_DIR:-./app}:/var/www/default/htdocs:rw
+      - ${PROJET1_HOST?Variable PROJET1_HOST manquante}:/var/www/projet1
+      - ${PROJET2_HOST?Variable PROJET2_HOST manquante}:/var/www/projet2
       - ./php-custom.d:/etc/php-custom.d:ro
     restart: unless-stopped
+    networks: [web]
+
+  apache:
+    container_name: ${APACHE_CONTAINER_NAME:-fpm-php54-apache}
+    build: ./apache
+    depends_on: [php54-fpm]
+    ports:
+      - target: 80
+        published: ${APACHE_PORT:-8004}
+        protocol: tcp
+    volumes:
+      - ${APP_DIR:-./app}:/var/www/default/htdocs:rw
+      - ${PROJET1_HOST?Variable PROJET1_HOST manquante}:/var/www/projet1
+      - ${PROJET2_HOST?Variable PROJET2_HOST manquante}:/var/www/projet2
+      - ./apache/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
+      - ./apache/vhosts:/usr/local/apache2/conf/vhosts:ro
+      # - ./apache/logs:/usr/local/apache2/logs   # optionnel
+    restart: unless-stopped
+    networks: [web]
+
+networks:
+  web:
+    driver: bridge
