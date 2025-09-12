@@ -9,7 +9,7 @@
   [PHP54.md](PHP54.md)
 
 ### INSTALL
-`./run.sh`
+`./start.sh`
 
 ### USAGE
 
