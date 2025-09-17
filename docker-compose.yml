@@ -72,11 +72,16 @@ services:
     image: phpmyadmin/phpmyadmin:latest
     container_name: ${PHPMYADMIN_CONTAINER_NAME:-phpmyadmin}
     environment:
-      PMA_HOST: ${MARIADB_NAME:-mariadb}
-      PMA_USER: ${DB_USER:-myapp}
-      PMA_PORT: ${DB_PORT:-3306}
-      PMA_PASSWORD: ${DB_PASS:-secret}
+      PMA_ARBITRARY: "1"
+      # si vous voulez que phpMyAdmin se connecte automatiquement à MariaDB, décommentez !
+#      PMA_HOST: ${MARIADB_NAME:-mariadb}
+#      PMA_USER: ${DB_USER:-myapp}
+#      PMA_PORT: ${DB_PORT:-3306}
+#      PMA_PASSWORD: ${DB_PASS:-secret}
+      # ============================
       UPLOAD_LIMIT: 256M
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - target: 80
         published: ${PHPMYADMIN_PORT:-8081}
