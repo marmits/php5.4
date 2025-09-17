@@ -40,6 +40,11 @@ function h($v) { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); }
             </div>
             <div class="row mb-1">
                 <div class="col">
+                    <a class="btn btn-success" href="/mariaDocker.php" role="button">TEST MARIA DOCKER</a><br />
+                </div>
+            </div>
+            <div class="row mb-1">
+                <div class="col">
                     <a class="btn btn-success" href="info.php" role="button">PHP INFO</a><br />
                 </div>
             </div>

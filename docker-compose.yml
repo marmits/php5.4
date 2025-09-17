@@ -7,21 +7,19 @@ services:
       NEW_UID: ${NEW_UID:-1000}
       NEW_GID: ${NEW_GID:-1000}
       ENABLE_MODULES: ${ENABLE_MODULES:-mysql,mysqli,pdo_mysql,mcrypt,gd,intl,soap,zip}
-
-      # Exemple SQL
-      DB_HOST: ${DB_HOST:-host.docker.internal}
+      DB_HOST: ${DB_HOST:-mariadb}
       DB_PORT: ${DB_PORT:-3306}
       DB_NAME: ${DB_NAME:-privmar}
-      DB_USER: ${DB_USER:-root}
-      DB_PASS: ${DB_PASS:-ton_mot_de_passe}
-
-      # DISABLE_MODULES: xdebug
+      DB_USER: ${DB_USER:-myapp}
+      DB_PASS: ${DB_PASS:-secret}
     volumes:
       - ${APP_DIR:-./app}:/var/www/default/htdocs:rw
       - ${PROJET1_HOST?Variable PROJET1_HOST manquante}:/var/www/projet1
       - ${PROJET2_HOST?Variable PROJET2_HOST manquante}:/var/www/projet2
       - ./php-custom.d:/etc/php-custom.d:ro
     restart: unless-stopped
+    depends_on:
+      - mariadb
     networks: [web]
 
   apache:
@@ -38,9 +36,50 @@ services:
       - ${PROJET2_HOST?Variable PROJET2_HOST manquante}:/var/www/projet2
       - ./apache/httpd.conf:/usr/local/apache2/conf/httpd.conf:ro
       - ./apache/vhosts:/usr/local/apache2/conf/vhosts:ro
-      # - ./apache/logs:/usr/local/apache2/logs   # optionnel
     restart: unless-stopped
     networks: [web]
+
+  mariadb:
+    container_name: ${MARIADB_CONTAINER_NAME:-mariadb}
+    build: ./mariaDB
+    command: ["mysqld", "--port=${DB_PORT:-3306}"]
+    environment:
+      TZ: ${TIMEZONE:-Europe/Paris}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-RootPass!}
+      MARIADB_DATABASE: ${DB_NAME:-privmar}
+      MARIADB_USER: ${DB_USER:-myapp}
+      MARIADB_PASSWORD: ${DB_PASS:-secret}
+    volumes:
+      - ./mariaDB/bdd:/var/lib/mysql
+    ports:
+      - target: ${DB_PORT:-3306}
+        published: ${MARIADB_PUBLISHED_PORT:-3307}
+        protocol: tcp
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -uroot -p\"$${MARIADB_ROOT_PASSWORD}\" -P ${DB_PORT:-3306} || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks: [web]
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: ${PHPMYADMIN_CONTAINER_NAME:-phpmyadmin}
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: ${DB_USER:-myapp}
+      PMA_PORT: ${DB_PORT:-3306}
+      PMA_PASSWORD: ${DB_PASS:-secret}
+      UPLOAD_LIMIT: 256M
+    ports:
+      - target: 80
+        published: ${PHPMYADMIN_PORT:-8081}
+        protocol: tcp
+    depends_on: [mariadb]
+    restart: unless-stopped
+    networks: [web]
+
 
 networks:
   web:
