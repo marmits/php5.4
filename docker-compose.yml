@@ -7,7 +7,7 @@ services:
       NEW_UID: ${NEW_UID:-1000}
       NEW_GID: ${NEW_GID:-1000}
       ENABLE_MODULES: ${ENABLE_MODULES:-mysql,mysqli,pdo_mysql,mcrypt,gd,intl,soap,zip}
-      DB_HOST: ${DB_HOST:-mariadb}
+      DB_HOST: ${MARIADB_NAME:-mariadb}
       DB_PORT: ${DB_PORT:-3306}
       DB_NAME: ${DB_NAME:-privmar}
       DB_USER: ${DB_USER:-myapp}
@@ -40,7 +40,8 @@ services:
     networks: [web]
 
   mariadb:
-    container_name: ${MARIADB_CONTAINER_NAME:-mariadb}
+    container_name: ${MARIADB_NAME:-mariadb}      # facultatif, visible dans 'docker ps'
+    hostname: ${MARIADB_NAME:-mariadb}            # facultatif
     build: ./mariaDB
     command: ["mysqld", "--port=${DB_PORT:-3306}"]
     environment:
@@ -61,13 +62,17 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-    networks: [web]
+    networks:
+      web:
+        aliases:
+          - ${MARIADB_NAME:-mariadb}
+
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: ${PHPMYADMIN_CONTAINER_NAME:-phpmyadmin}
     environment:
-      PMA_HOST: mariadb
+      PMA_HOST: ${MARIADB_NAME:-mariadb}
       PMA_USER: ${DB_USER:-myapp}
       PMA_PORT: ${DB_PORT:-3306}
       PMA_PASSWORD: ${DB_PASS:-secret}

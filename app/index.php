@@ -35,7 +35,7 @@ function h($v) { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); }
             </div>
             <div class="row mb-1">
                 <div class="col">
-                    <a class="btn btn-success" href="/testsql/browse_table.php?t=datas" role="button">TEST SQL</a><br />
+                    <a class="btn btn-success" href="/testsql/browse_table.php" role="button">TEST SQL</a><br />
                 </div>
             </div>
             <div class="row mb-1">

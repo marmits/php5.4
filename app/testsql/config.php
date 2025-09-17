@@ -2,7 +2,6 @@
 return array(
     'db' => array(
         // Astuce : si tu préfères piloter ça via des variables d'env (Compose),
-//        'host'    => getenv('DB_HOST') ?: 'host.docker.internal',
         'host'    => getenv('DB_HOST'),
         'port'    => getenv('DB_PORT'),
         'name'    => getenv('DB_NAME'),
